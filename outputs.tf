@@ -1,3 +1,7 @@
+output "spring_cloud_build_pack_bindings_id" {
+  description = "Map of id values across all spring_cloud_build_pack_bindings, keyed the same as var.spring_cloud_build_pack_bindings"
+  value       = { for k, v in azurerm_spring_cloud_build_pack_binding.spring_cloud_build_pack_bindings : k => v.id }
+}
 output "spring_cloud_build_pack_bindings_binding_type" {
   description = "Map of binding_type values across all spring_cloud_build_pack_bindings, keyed the same as var.spring_cloud_build_pack_bindings"
   value       = { for k, v in azurerm_spring_cloud_build_pack_binding.spring_cloud_build_pack_bindings : k => v.binding_type }
