@@ -20,21 +20,22 @@ EOT
       secrets    = optional(map(string))
     }))
   }))
-  # --- Unconfirmed validation candidates, derived from azurerm_spring_cloud_build_pack_binding's provider source ---
-  # Not auto-enabled: either a bespoke provider validator we can't safely translate,
-  # or a path that crosses a list-typed block (needs its own for_each wrapping).
-  # Review, translate into a real validation{} block above, and delete once confirmed.
-  # path: spring_cloud_builder_id
-  #   source:    [from validate.SpringCloudBuildServiceBuilderID] !ok
-  # path: spring_cloud_builder_id
-  #   source:    [from validate.SpringCloudBuildServiceBuilderID] err != nil
-  # path: binding_type
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: launch.properties[*]
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: launch.secrets[*]
-  #   condition: length(value) > 0
-  #   message:   must not be empty
+  validation {
+    condition = alltrue([
+      for k, v in var.spring_cloud_build_pack_bindings : (
+        v.launch == null || (v.launch.properties == null || (alltrue([for x in v.launch.properties : length(x) > 0])))
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.spring_cloud_build_pack_bindings : (
+        v.launch == null || (v.launch.secrets == null || (alltrue([for x in v.launch.secrets : length(x) > 0])))
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  # Note: 3 additional provider-side validators are enforced at apply time but not mirrored as validation{} blocks here (bespoke or non-mechanically-translatable).
 }
 
